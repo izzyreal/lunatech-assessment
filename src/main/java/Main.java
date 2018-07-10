@@ -33,11 +33,12 @@ public class Main extends HttpServlet {
 		
 		Tag<?> b1 = actionButtonForm("Query", "query");
 		Tag<?> b2 = actionButtonForm("Reports", "reports");
+		Tag<?> b3 = form(button("Query JSP")).withAction("query.jsp");
 		
 		ContainerTag page =
 
 				html(head(title("Welcome")),
-						body(main(attrs("#main.content"), h1("Welcome to Izmar's Lunatech assessment!"), b1, b2)));
+						body(main(attrs("#main.content"), h1("Welcome to Izmar's Lunatech assessment!"), b1, b2, b3)));
 
 		w.print(page.renderFormatted());
 	}
