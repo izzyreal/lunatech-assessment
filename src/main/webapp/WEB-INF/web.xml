@@ -14,10 +14,29 @@
         <servlet-name>MainServlet</servlet-name>
         <servlet-class>Main</servlet-class>
     </servlet>
+    
+	<servlet>
+		<servlet-name>QueryServlet</servlet-name>
+		<servlet-class>Query</servlet-class>
+	</servlet>
 
+	<servlet>
+		<servlet-name>ReportsServlet</servlet-name>
+		<servlet-class>Reports</servlet-class>
+	</servlet>
+	
     <servlet-mapping>
         <servlet-name>MainServlet</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>QueryServlet</servlet-name>
+        <url-pattern>/query</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>ReportsServlet</servlet-name>
+        <url-pattern>/reports</url-pattern>
+    </servlet-mapping>
 </web-app>
