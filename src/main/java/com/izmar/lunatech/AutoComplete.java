@@ -1,3 +1,4 @@
+package com.izmar.lunatech;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class AutoComplete extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		List<String> countries = Database.getCountryNames();
+		
+		countries.addAll(Database.getCountryCodes());
 		
 		JSONArray json = new JSONArray(countries);
 		response.setContentType("application/json");

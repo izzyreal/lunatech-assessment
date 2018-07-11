@@ -1,3 +1,4 @@
+package com.izmar.lunatech;
 import static j2html.TagCreator.attrs;
 import static j2html.TagCreator.body;
 import static j2html.TagCreator.button;
