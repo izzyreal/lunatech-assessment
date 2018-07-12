@@ -18,9 +18,12 @@ public class Database {
 	static HashMap<String, String> countryCodeNameMap = new HashMap<String, String>();
 
 	private static void populateCountryMaps() {
+
 		try {
+
 			Connection c = getConnection();
-			String sql = "select * from countries;";
+
+			String sql = "SELECT * FROM countries;";
 			Statement stmt = c.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
@@ -28,6 +31,7 @@ public class Database {
 				countryNameCodeMap.put(rs.getString("name"), rs.getString("code"));
 				countryCodeNameMap.put(rs.getString("code"), rs.getString("name"));
 			}
+
 			c.close();
 
 		} catch (URISyntaxException e) {
@@ -37,14 +41,29 @@ public class Database {
 		}
 	}
 
-	Database() {
+	public static String getCountryCode(String countryName) {
+
+		if (countryNameCodeMap.size() == 0)
+			populateCountryMaps();
+
+		return countryNameCodeMap.get(countryName);
+	}
+
+	public static String getCountryName(String countryCode) {
+
+		if (countryCodeNameMap.size() == 0)
+			populateCountryMaps();
+
+		return countryCodeNameMap.get(countryCode);
 	}
 
 	private static List<String> getFromCountries(String column) {
 		List<String> res = new ArrayList<String>();
 		try {
+
 			Connection c = getConnection();
-			String sql = "select * from countries;";
+
+			String sql = "SELECT * FROM countries;";
 			Statement stmt = c.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
@@ -69,44 +88,43 @@ public class Database {
 		return getFromCountries("code");
 	}
 
-	private static String getCountryCode(String countryName) {
-		if (countryNameCodeMap.size() == 0)
-			populateCountryMaps();
-		return countryNameCodeMap.get(countryName);
-	}
-
 	public static List<String> getAirportsAsStrings(String country) {
 		List<String> res = new ArrayList<String>();
 		ResultSet rs = getAirportsAsResultSet(country);
-		try {
-			while (rs.next()) {
-				String airport = rs.getString("name");
-				res.add(airport);
+
+		if (rs != null) {
+			try {
+				while (rs.next()) {
+					String airport = rs.getString("name");
+					res.add(airport);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+			
 		}
 		return res;
 	}
 
-	public static ResultSet getAirportsAsResultSet(String country) {
-
-		System.out.println("Country is " + country);
+	private static ResultSet getAirportsAsResultSet(String country) {
 
 		ResultSet rs = null;
 
 		String countryCode = country;
 
-		if (countryCode.length() != 2) countryCode = getCountryCode(countryCode);
-		
-		System.out.println("Country code is " + countryCode);
+		if (countryCode.length() != 2)
+			countryCode = getCountryCode(countryCode);
 
 		try {
+
 			Connection c = getConnection();
+
 			String sql = "SELECT * FROM airports WHERE iso_country='" + countryCode + "';";
 			Statement stmt = c.createStatement();
 			rs = stmt.executeQuery(sql);
+
 			c.close();
+
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -120,13 +138,17 @@ public class Database {
 
 		List<ResultSet> res = new ArrayList<ResultSet>();
 		Iterator<String> airportsIt = airports.iterator();
-		
+
 		try {
+
 			Connection c = getConnection();
+
 			while (airportsIt.hasNext()) {
+
 				String airport = airportsIt.next();
 				String sql = "SELECT * FROM airports WHERE name=?";
-				PreparedStatement stmt = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+				PreparedStatement stmt = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.CONCUR_READ_ONLY);
 				stmt.setString(1, airport);
 				ResultSet airportsRs = stmt.executeQuery();
 				airportsRs.next();
@@ -136,8 +158,11 @@ public class Database {
 				stmt.setString(1, airportIdent);
 				ResultSet rs = stmt.executeQuery();
 				res.add(rs);
+
 			}
+
 			c.close();
+
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -150,13 +175,17 @@ public class Database {
 	public static int getAirportCount(String countryCode) {
 		int res = 0;
 		try {
+			
 			Connection c = getConnection();
+			
 			String sql = "SELECT COUNT(*) FROM airports WHERE iso_country='" + countryCode + "';";
 			Statement stmt = c.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next())
 				res = rs.getInt("count");
+			
 			c.close();
+			
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -166,14 +195,12 @@ public class Database {
 	}
 
 	private static Connection getConnection() throws URISyntaxException, SQLException {
-		System.out.println("getConnection() called");
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		String dbUrl = System.getenv("JDBC_DATABASE_URL");
-        //String jdbcutf8 = "&useUnicode=true&characterEncoding=UTF-8";
 		return DriverManager.getConnection(dbUrl);
 	}
 
