@@ -18,16 +18,16 @@ import org.json.JSONArray;
 public class AutoComplete extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	private List<String> countries = new ArrayList<String>();
+
 	public AutoComplete() {
 		super();
-
+		countries = Database.getCountryNames();
+		countries.addAll(Database.getCountryCodes());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		List<String> countries = Database.getCountryNames();
-		
-		countries.addAll(Database.getCountryCodes());
 		
 		JSONArray json = new JSONArray(countries);
 		response.setContentType("application/json");

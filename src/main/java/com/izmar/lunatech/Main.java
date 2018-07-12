@@ -5,6 +5,7 @@ import static j2html.TagCreator.button;
 import static j2html.TagCreator.h1;
 import static j2html.TagCreator.head;
 import static j2html.TagCreator.html;
+import static j2html.TagCreator.link;
 import static j2html.TagCreator.main;
 import static j2html.TagCreator.title;
 import static j2html.TagCreator.form;
@@ -35,12 +36,11 @@ public class Main extends HttpServlet {
 		Tag<?> b1 = actionButtonForm("Query", "query");
 		Tag<?> b2 = actionButtonForm("Reports", "reports");
 		Tag<?> b3 = form(button("Query JSP")).withAction("query.jsp");
-		
+
 		ContainerTag page =
 
-				html(head(title("Welcome")),
+				html(head(title("Welcome"), link().withRel("stylesheet").withHref("static/css/style.css")),
 						body(main(attrs("#main.content"), h1("Welcome to Izmar's Lunatech assessment!"), b1, b2, b3)));
-
 		w.print(page.renderFormatted());
 	}
 	
