@@ -9,13 +9,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.izmar.lunatech.model.Airport;
 import com.izmar.lunatech.model.Runway;
-
-// H2 In-Memory Database Example shows about storing the database contents into memory. 
 
 public class Database {
 
@@ -24,7 +23,11 @@ public class Database {
 	private static final String DB_USER = "";
 	private static final String DB_PASSWORD = "";
 
+	static HashMap<String, String> countryNameCodeMap = new HashMap<String, String>();
+	static HashMap<String, String> countryCodeNameMap = new HashMap<String, String>();
+
 	public static void initTables() {
+
 		Connection connection = getConnection();
 
 		PreparedStatement st = null;
@@ -45,6 +48,7 @@ public class Database {
 		Iterator<String> sqlIt = sql.iterator();
 
 		try {
+
 			connection.setAutoCommit(false);
 
 			while (sqlIt.hasNext()) {
@@ -56,24 +60,19 @@ public class Database {
 
 			connection.commit();
 			connection.close();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	static HashMap<String, String> countryNameCodeMap = new HashMap<String, String>();
-	static HashMap<String, String> countryCodeNameMap = new HashMap<String, String>();
-
-	static List<String> countryCodes = new ArrayList<String>();
-	static List<String> countryNames = new ArrayList<String>();
-
 	private static void populateCountryMaps() {
+
+		Connection c = getConnection();
+		String sql = "select * from countries;";
 
 		try {
 
-			Connection c = getConnection();
-
-			String sql = "SELECT * FROM countries;";
 			Statement stmt = c.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
@@ -105,13 +104,14 @@ public class Database {
 		return countryCodeNameMap.get(countryCode);
 	}
 
-	private static List<String> getFromCountries(String column) {
+	public static List<String> getFromCountries(String column) {
+
 		List<String> res = new ArrayList<String>();
+		Connection c = getConnection();
+		String sql = "select " + column + " from countries;";
+
 		try {
 
-			Connection c = getConnection();
-
-			String sql = "SELECT * FROM countries;";
 			Statement stmt = c.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
@@ -126,44 +126,26 @@ public class Database {
 		return res;
 	}
 
-	public static List<String> getCountryNames() {
-
-		if (countryNames.size() == 0) {
-			countryNames = getFromCountries("name");
-		}
-
-		return countryNames;
-	}
-
-	public static List<String> getCountryCodes() {
-
-		if (countryCodes.size() == 0) {
-			countryCodes = getFromCountries("code");
-		}
-
-		return countryCodes;
-	}
-
 	public static List<Airport> getAirports(String country) {
-		List<Airport> res = new ArrayList<Airport>();
 
+		List<Airport> res = new ArrayList<Airport>();
 		String countryCode = country;
 
 		if (countryCode.length() != 2)
 			countryCode = getCountryCode(countryCode);
 
 		Connection c = getConnection();
-		PreparedStatement stmt = null;
+		String sql = "select * from airports where iso_country='" + countryCode + "';";
 
 		try {
 
-			String sql = "SELECT * FROM airports WHERE iso_country='" + countryCode + "';";
-			stmt = c.prepareStatement(sql);
+			PreparedStatement stmt = c.prepareStatement(sql);
 			ResultSet rs = stmt.executeQuery();
 			rs.next();
-			while (rs.next()) {
+
+			while (rs.next())
 				res.add(new Airport(rs.getString("ident"), rs.getString("name")));
-			}
+
 			rs.close();
 			c.close();
 
@@ -175,11 +157,12 @@ public class Database {
 	}
 
 	public static Map<String, List<String>> getSurfaceTypes() {
-		
-		// I copied this approach, especially the sql query, from https://github.com/arjun-1
-		
+
+		// I copied this approach, especially the sql query, from
+		// https://github.com/arjun-1
+
 		Map<String, List<String>> res = new HashMap<String, List<String>>();
-				
+
 		String sql = "select distinct(r.surface), c.name from airports a, runways r, countries c where a.id = r.airport_ref and c.code = a.iso_country order by c.name;";
 
 		try {
@@ -192,16 +175,16 @@ public class Database {
 			String prevCountry = "";
 			List<String> currentCountrySurfaces = new ArrayList<String>();
 			while (rs.next()) {
-				
-				if (prevCountry.equals("")) prevCountry = rs.getString("name");
-				System.out.println("prevCountry: " + prevCountry);
+
+				if (prevCountry.equals(""))
+					prevCountry = rs.getString("name");
 				if (!rs.getString("name").equals(prevCountry)) {
 					res.put(prevCountry, currentCountrySurfaces);
 					String country = rs.getString("name");
 					prevCountry = country;
 					currentCountrySurfaces = new ArrayList<String>();
 				}
-				
+
 				currentCountrySurfaces.add(rs.getString("surface"));
 			}
 
@@ -221,7 +204,7 @@ public class Database {
 
 			Connection c = getConnection();
 
-			String sql = "SELECT * FROM runways WHERE airport_ident=?;";
+			String sql = "select id from runways where airport_ident=?;";
 			PreparedStatement stmt = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
 			stmt.setString(1, airportIdent);
@@ -239,18 +222,20 @@ public class Database {
 		return res;
 	}
 
-	public static int getAirportCount(String countryCode) {
-		int res = 0;
-		try {
+	public static Map<String, Integer> getCommon(String table, String column, boolean most) {
+		Map<String, Integer> res = new LinkedHashMap<String, Integer>();
 
+		String sql = "select " + column + ", count(*) as counted from " + table + " group by " + column
+				+ " order by counted " + (most ? "desc" : "asc") + " limit 10;";
+
+		try {
 			Connection c = getConnection();
 
-			String sql = "SELECT COUNT(*) FROM airports WHERE iso_country='" + countryCode + "';";
-			Statement stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
+			Statement st = c.createStatement();
+			ResultSet rs = st.executeQuery(sql);
 
-			if (rs.next())
-				res = rs.getInt(1);
+			while (rs.next())
+				res.put(rs.getString(column), rs.getInt("counted"));
 
 			c.close();
 
@@ -261,18 +246,74 @@ public class Database {
 		return res;
 	}
 
+	public static List<String> getCommonAirportCountries(boolean most) {
+		
+		List<String> res = new ArrayList<String>();
+		Map<String, Integer> tm = getCommon("airports", "iso_country", most);
+		Iterator<String> keySet = tm.keySet().iterator();
+
+		while (keySet.hasNext()) {
+			String key = keySet.next();
+			res.add(key + " has " + tm.get(key).intValue() + " airport(s).");
+		}
+
+		return res;
+	}
+
+	public static List<String> getCountriesWithNoAirports() {
+
+		List<String> res = new ArrayList<String>();
+		String sql = "select code from countries where code not in (select iso_country from airports);";
+		Connection c = getConnection();
+
+		try {
+
+			Statement st = c.createStatement();
+			ResultSet rs = st.executeQuery(sql);
+
+			while (rs.next()) {
+
+				String code = rs.getString("code");
+				String name = getCountryName(code);
+				res.add(name + "(" + code + ")" + " has no airports");
+
+			}
+
+			c.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return res;
+	}
+
+	public static List<String> getMostCommonRunwayIdents() {
+
+		List<String> res = new ArrayList<String>();
+		Map<String, Integer> tm = getCommon("runways", "le_ident", true);
+		Iterator<String> keySet = tm.keySet().iterator();
+
+		while (keySet.hasNext()) {
+
+			String key = keySet.next();
+			res.add("Runway identification " + key + " occurs " + tm.get(key).intValue() + " times.");
+
+		}
+
+		return res;
+	}
+
 	private static Connection getConnection() {
 		Connection dbConnection = null;
 		try {
 			Class.forName(DB_DRIVER);
-		} catch (ClassNotFoundException e) {
-			System.out.println(e.getMessage());
-		}
-		try {
 			dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
 			return dbConnection;
-		} catch (SQLException e) {
+		} catch (ClassNotFoundException e) {
 			System.out.println(e.getMessage());
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return dbConnection;
 	}

@@ -1,4 +1,4 @@
-package com.izmar.lunatech.view;
+package com.izmar.lunatech.viewcontroller;
 
 import static j2html.TagCreator.button;
 import static j2html.TagCreator.form;
@@ -39,7 +39,6 @@ public class Main extends HttpServlet {
 		w.print(page.renderFormatted());
 
 		Database.initTables();
-		
 	}
 
 	private Tag<?> actionButtonForm(String text, String action) {

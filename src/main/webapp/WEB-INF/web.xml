@@ -10,22 +10,22 @@
 
 	<servlet>
 		<servlet-name>MainServlet</servlet-name>
-		<servlet-class>com.izmar.lunatech.Main</servlet-class>
+		<servlet-class>com.izmar.lunatech.viewcontroller.Main</servlet-class>
 	</servlet>
 
 	<servlet>
 		<servlet-name>QueryServlet</servlet-name>
-		<servlet-class>com.izmar.lunatech.Query</servlet-class>
+		<servlet-class>com.izmar.lunatech.viewcontroller.Query</servlet-class>
 	</servlet>
 
 	<servlet>
 		<servlet-name>ReportsServlet</servlet-name>
-		<servlet-class>com.izmar.lunatech.Reports</servlet-class>
+		<servlet-class>com.izmar.lunatech.viewcontroller.Reports</servlet-class>
 	</servlet>
 
 	<servlet>
 		<servlet-name>Auto</servlet-name>
-		<servlet-class>com.izmar.lunatech.AutoComplete</servlet-class>
+		<servlet-class>com.izmar.lunatech.viewcontroller.AutoComplete</servlet-class>
 	</servlet>
 
 	<servlet-mapping>

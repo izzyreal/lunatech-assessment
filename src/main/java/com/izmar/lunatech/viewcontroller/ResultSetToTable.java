@@ -2,7 +2,7 @@
  * Copied from http://www.codereye.com/2014/12/show-resultset-as-html-table.html
  */
 
-package com.izmar.lunatech;
+package com.izmar.lunatech.viewcontroller;
 
 import java.io.IOException;
 import java.io.Writer;

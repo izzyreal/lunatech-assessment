@@ -1,4 +1,4 @@
-package com.izmar.lunatech;
+package com.izmar.lunatech.viewcontroller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,9 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
-/**
- * Servlet implementation class AutoComplete
- */
+import com.izmar.lunatech.Database;
 
 public class AutoComplete extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -22,13 +20,12 @@ public class AutoComplete extends HttpServlet {
 
 	public AutoComplete() {
 		super();
-		countries = Database.getCountryNames();
-		countries.addAll(Database.getCountryCodes());
+		countries = Database.getFromCountries("name");
+		countries.addAll(Database.getFromCountries("code"));
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		
+			throws ServletException, IOException {		
 		JSONArray json = new JSONArray(countries);
 		response.setContentType("application/json");
 		response.getWriter().print(json);

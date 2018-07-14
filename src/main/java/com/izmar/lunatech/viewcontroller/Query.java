@@ -1,4 +1,4 @@
-package com.izmar.lunatech.view;
+package com.izmar.lunatech.viewcontroller;
 
 import static j2html.TagCreator.h1;
 import static j2html.TagCreator.head;

@@ -24,9 +24,4 @@ public class Country {
 		return Database.getAirports(code);
 	}
 	
-	public int getAirportCount() {
-		//return getAirports().size();
-		return Database.getAirportCount(code);
-	}
-	
 }
