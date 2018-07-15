@@ -75,8 +75,6 @@ public class Query extends HttpServlet {
 			Airport airport = airportsIt.next();
 			List<Runway> runways = airport.getRunways();
 
-			System.out.println("Airport name: " + airport.getName());
-
 			if (runways.size() == 0) {
 				w.print("<b>" + airport.getName() + "</b> has no runways.<br><br>");
 				continue;
