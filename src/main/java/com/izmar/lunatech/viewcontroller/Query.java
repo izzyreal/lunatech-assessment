@@ -4,6 +4,7 @@ import static j2html.TagCreator.h1;
 import static j2html.TagCreator.head;
 import static j2html.TagCreator.link;
 import static j2html.TagCreator.title;
+import static j2html.TagCreator.meta;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,9 +30,10 @@ public class Query extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+		
+		resp.setContentType("text/html; charset=UTF-8");
 		PrintWriter w = resp.getWriter();
-		w.print(head(title("Query Results"), link().withRel("stylesheet").withHref("static/css/style.css"))
+		w.print(head(title("Query Results"), meta().withCharset("UTF-8"), link().withRel("stylesheet").withHref("static/css/style.css"))
 				.renderFormatted());
 
 		if (req.getParameter("submitbutton") == null)
@@ -73,8 +75,9 @@ public class Query extends HttpServlet {
 			Airport airport = airportsIt.next();
 			List<Runway> runways = airport.getRunways();
 
-			if (runways.size() == 0) {
+			System.out.println("Airport name: " + airport.getName());
 
+			if (runways.size() == 0) {
 				w.print("<b>" + airport.getName() + "</b> has no runways.<br><br>");
 				continue;
 

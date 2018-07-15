@@ -3,6 +3,7 @@ package com.izmar.lunatech.viewcontroller;
 import static j2html.TagCreator.h1;
 import static j2html.TagCreator.head;
 import static j2html.TagCreator.link;
+import static j2html.TagCreator.meta;
 import static j2html.TagCreator.title;
 
 import java.io.IOException;
@@ -30,9 +31,10 @@ public class Reports extends HttpServlet {
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
+		resp.setContentType("text/html; charset=UTF-8");
 		PrintWriter w = resp.getWriter();
 
-		w.print(head(title("Reports"), link().withRel("stylesheet").withHref("static/css/style.css"))
+		w.print(head(title("Reports"), meta().withCharset("UTF-8"), link().withRel("stylesheet").withHref("static/css/style.css"))
 				.renderFormatted());
 
 		w.print(h1("The 10 countries with the most airports").renderFormatted());

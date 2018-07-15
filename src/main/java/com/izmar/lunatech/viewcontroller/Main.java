@@ -6,6 +6,7 @@ import static j2html.TagCreator.h1;
 import static j2html.TagCreator.head;
 import static j2html.TagCreator.html;
 import static j2html.TagCreator.link;
+import static j2html.TagCreator.meta;
 import static j2html.TagCreator.title;
 
 import java.io.IOException;
@@ -32,18 +33,20 @@ public class Main extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+		resp.setContentType("text/html; charset=UTF-8");
 		PrintWriter w = resp.getWriter();
-
+		
 		Tag<?> b1 = actionButtonForm("Query", "query.jsp");
 		Tag<?> b2 = actionButtonForm("Reports", "reports");
-
-		ContainerTag page = html(head(title("Welcome"), link().withRel("stylesheet").withHref("static/css/style.css")),
+		
+		ContainerTag page = html(head(title("Welcome"), meta().withCharset("UTF-8"), link().withRel("stylesheet").withHref("static/css/style.css")),
 				h1("Welcome to Izmar's Lunatech assessment!"), b1, b2);
 
 		w.print(page.renderFormatted());
 
 		// Make sure the database is initialized. What is a better place to do this? 
 		Database.initTables();
+		
 	}
 
 	private Tag<?> actionButtonForm(String text, String action) {
