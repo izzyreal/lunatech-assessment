@@ -186,7 +186,7 @@ public class Database {
 	 * @return list of airports of a country
 	 */
 	public static List<Airport> getAirports(Country country) {
-
+		
 		Connection c = getConnection();
 		List<Airport> res = new ArrayList<Airport>();
 		String sql = "select * from airports where iso_country='" + country.getCode() + "';";
@@ -195,11 +195,10 @@ public class Database {
 
 			Statement stmt = c.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
-			rs.next();
 
 			while (rs.next())
 				res.add(new Airport(rs.getString("ident"), rs.getString("name")));
-
+			
 			rs.close();
 			c.close();
 

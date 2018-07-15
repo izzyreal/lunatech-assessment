@@ -32,7 +32,7 @@ public class AutoComplete extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		
 		JSONArray json = new JSONArray(countries);
 		response.setContentType("application/json");
 		response.getWriter().print(json);
