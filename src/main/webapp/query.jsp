@@ -33,7 +33,7 @@
 
 <div class="ui-widget">
 	<form method="post" action="query">
-		<label for="country">Country: </label> <input id="country" name="country">
+		<label for="country">Country code or name: </label> <input id="country" name="country">
 		<button type="submit" name="submitbutton">Submit</button>
 	</form>
 </div>

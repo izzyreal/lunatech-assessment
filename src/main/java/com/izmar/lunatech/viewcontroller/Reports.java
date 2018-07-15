@@ -16,13 +16,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.izmar.lunatech.Database;
+import com.izmar.lunatech.model.Airport;
+import com.izmar.lunatech.model.Country;
+import com.izmar.lunatech.model.Runway;
+
+/*
+ * Servlet that displays miscellaneous reports.
+ */
 
 public class Reports extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
 		PrintWriter w = resp.getWriter();
 
 		w.print(head(title("Reports"), link().withRel("stylesheet").withHref("static/css/style.css"))
@@ -30,49 +37,59 @@ public class Reports extends HttpServlet {
 
 		w.print(h1("The 10 countries with the most airports").renderFormatted());
 
-		boolean most = true;
+		Iterator<Country> aci = Airport.getCountriesWithMostAirports().iterator();
 		
-		Iterator<String> aci = Database.getCommonAirportCountries(most).iterator();
-		while (aci.hasNext())
-			w.print(aci.next() + "<br>");
+		while (aci.hasNext()) {			
 
+			Country c = aci.next();			
+			w.print(c.toString() + " has " + c.getAirportCount() + " airports.<br>");
+			
+		}
+		
 		w.print("<br>");
 		w.print(h1("The 10 countries with the least airports").renderFormatted());
 
-		most = false;
+		aci = Airport.getCountriesWithLeastAirports().iterator();
 		
-		List<String> leastAirports = Database.getCommonAirportCountries(most);
-		List<String> noAirports = Database.getCountriesWithNoAirports();
+		while (aci.hasNext()) {			
 
-		for (int i = 0; i < 10; i++) {
-			if (i < noAirports.size()) {
-				w.print(noAirports.get(i) + "<br>");
-			} else {
-				w.print(leastAirports.get(i - noAirports.size()) + "<br>");
-			}
+			Country c = aci.next();			
+			w.print(c.toString() + " has " + (c.getAirportCount() == 0 ? "no" : c.getAirportCount()) + " airport(s).<br>");
+			
 		}
-		
+
 		w.print("<br>" + h1("Runway surface types per country").renderFormatted());
 
-		Map<String, List<String>> surfaceMap = Database.getSurfaceTypes();
+		Map<String, List<String>> surfaceMap = Country.getRunwaySurfaceTypesPerCountry();
 		Iterator<String> keySetIt = surfaceMap.keySet().iterator();
 
 		while (keySetIt.hasNext()) {
+			
 			String country = keySetIt.next();
 			Iterator<String> surfaces = surfaceMap.get(country).iterator();
 			w.print("<b>" + country + "</b> has the following surfaces:<br>");
+			
 			while (surfaces.hasNext()) {
+				
 				String surface = surfaces.next();
-				if (surface == null) continue;
+			
+				if (surface == null)
+					continue;
+				
 				w.print(surface + "<br>");
+				
 			}
+		
 			w.print("<br><br>");
 		}
 
 		w.print(h1("The 10 most common runway identifications").renderFormatted());
-		Iterator<String> ri = Database.getMostCommonRunwayIdents().iterator();
+		
+		Iterator<String> ri = Runway.getMostCommonIdents().iterator();
+
 		while (ri.hasNext())
 			w.print(ri.next() + "<br>");
+		
 	}
 
 }

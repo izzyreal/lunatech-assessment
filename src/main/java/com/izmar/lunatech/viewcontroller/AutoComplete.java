@@ -11,23 +11,31 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
-import com.izmar.lunatech.Database;
+import com.izmar.lunatech.model.Country;
+
+/*
+ * Servlet that makes a list of all existing country codes and names available to query.jsp
+ */
 
 public class AutoComplete extends HttpServlet {
+
+	private static List<String> countries = new ArrayList<String>();
+
 	private static final long serialVersionUID = 1L;
 
-	private List<String> countries = new ArrayList<String>();
-
 	public AutoComplete() {
-		super();
-		countries = Database.getFromCountries("name");
-		countries.addAll(Database.getFromCountries("code"));
+
+		if (countries.size() == 0)
+			countries = Country.getAllCountryNamesAndCodes();
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {		
+			throws ServletException, IOException {
+
 		JSONArray json = new JSONArray(countries);
 		response.setContentType("application/json");
 		response.getWriter().print(json);
+
 	}
 }

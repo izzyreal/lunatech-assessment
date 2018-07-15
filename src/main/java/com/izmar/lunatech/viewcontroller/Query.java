@@ -15,9 +15,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.izmar.lunatech.Database;
 import com.izmar.lunatech.model.Airport;
+import com.izmar.lunatech.model.Country;
 import com.izmar.lunatech.model.Runway;
+
+/*
+ * Servlet that displays all airports for a given country code or name, and a list of each airport's runway IDs.
+ */
 
 public class Query extends HttpServlet {
 
@@ -37,56 +41,56 @@ public class Query extends HttpServlet {
 
 		if (country == null || country == "") {
 
-			w.print("Please enter a valid country or country code.");
+			w.print("Please enter a country code or name.");
 			return;
+
 		}
 
-		List<Airport> airports = Database.getAirports(country);
+		Country c = new Country(country);
+
+		if (!c.exists()) {
+			
+			w.print("No country found with code or name " + country + ".");
+			return;
+			
+		}
+
+		List<Airport> airports = c.getAirports();
 
 		if (airports.size() == 0) {
 
-			w.print("No airports found for country " + country);
+			w.print("No airports found in " + c.toString());
 			return;
 
 		}
 
-		// At this point we are sure that either a valid country name or code has been
-		// submitted.
-		// We figure out the code if a name was submitted, or vice versa, so we can
-		// display a nice heading.
-
-		String countryCode = "";
-		String countryName = "";
-
-		if (country.length() == 2) {
-			countryCode = country;
-			countryName = Database.getCountryName(countryCode);
-		} else {
-			countryName = country;
-			countryCode = Database.getCountryCode(countryName);
-		}
-
-		w.print(h1("The following airports are found in " + countryName + " (" + countryCode + ")").renderFormatted());
+		w.print(h1("The following airports are found in " + c.toString()).renderFormatted());
 
 		Iterator<Airport> airportsIt = airports.iterator();
 
 		while (airportsIt.hasNext()) {
+
 			Airport airport = airportsIt.next();
 			List<Runway> runways = airport.getRunways();
+
 			if (runways.size() == 0) {
+
 				w.print("<b>" + airport.getName() + "</b> has no runways.<br><br>");
 				continue;
+
 			}
 
 			w.print("<b>" + airport.getName() + "</b> has the following runway(s):<br>");
 
 			Iterator<Runway> runwaysIt = runways.iterator();
+			
 			while (runwaysIt.hasNext())
 				w.print(runwaysIt.next().getId() + "<br>");
+			
 			w.print("<br>");
-			
-			
+
 		}
+		
 	}
 
 }

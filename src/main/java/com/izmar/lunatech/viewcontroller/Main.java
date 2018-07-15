@@ -21,6 +21,10 @@ import com.izmar.lunatech.Database;
 import j2html.tags.ContainerTag;
 import j2html.tags.Tag;
 
+/*
+ * Welcome page servlet, providing buttons for the 2 tasks users will perform with this app.
+ */
+
 public class Main extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -35,13 +39,15 @@ public class Main extends HttpServlet {
 
 		ContainerTag page = html(head(title("Welcome"), link().withRel("stylesheet").withHref("static/css/style.css")),
 				h1("Welcome to Izmar's Lunatech assessment!"), b1, b2);
-		
+
 		w.print(page.renderFormatted());
 
+		// Make sure the database is initialized. What is a better place to do this? 
 		Database.initTables();
 	}
 
 	private Tag<?> actionButtonForm(String text, String action) {
 		return form(button(text)).withAction(action);
 	}
+	
 }
