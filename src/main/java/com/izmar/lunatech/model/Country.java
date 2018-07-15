@@ -32,10 +32,7 @@ public class Country {
 
 				// Camelcase to make sure e.g. 'netherlands' or 'nEthErlANds' can be found
 
-				String p1 = codeOrName.substring(0, 1).toUpperCase();
-				String p2 = codeOrName.substring(1).toLowerCase();
-
-				codeOrName = p1 + p2;
+				codeOrName = camelCase(codeOrName);
 
 			}
 
@@ -98,6 +95,26 @@ public class Country {
 	@Override
 	public String toString() {
 		return getName() + " (" + code + ")";
+	}
+
+	private String camelCase(String str) {
+		
+		StringBuilder builder = new StringBuilder(str);
+		boolean isLastSpace = true;
+
+		for (int i = 0; i < builder.length(); i++) {
+			char ch = builder.charAt(i);
+
+			if (isLastSpace && ch >= 'a' && ch <= 'z') {
+				builder.setCharAt(i, (char) (ch + ('A' - 'a')));
+				isLastSpace = false;
+			} else if (ch != ' ')
+				isLastSpace = false;
+			else
+				isLastSpace = true;
+		}
+
+		return builder.toString();
 	}
 
 }
